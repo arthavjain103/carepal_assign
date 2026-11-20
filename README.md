@@ -154,8 +154,8 @@ flowchart TD
     I --> J[Groq LLM<br/>openai/gpt-oss-120b<br/>temperature 0.1]
     J --> K{Signal Tag?}
     
-    K -->|[[NOT_FOUND]]| L[Reply: info not found<br/>offer support-team contact]
-    K -->|[[ESCALATE]]| M[Reply: connect to human agent]
+    K -->|"NOT_FOUND"| L[Reply: info not found<br/>offer support-team contact]
+    K -->|"ESCALATE"| M[Reply: connect to human agent]
     K -->|None| N[Answer from context only]
     
     L --> O[Return Answer + Sources<br/>FastAPI /search → Streamlit UI]
