@@ -85,6 +85,10 @@ care_assign/
 ├── app.py                 # FastAPI server  (POST /search, GET /health)
 ├── main.py                # CLI chatbot
 ├── ingest.py              # Build KB: chunks → Pinecone vectors + BM25 index
+├── scraper.py             # CarePal KB builder: scrape thecarepal.com, clean,
+│                          # deduplicate, mask PII, Groq structured extraction
+│                          # (alternative data pipeline; current RAG uses
+│                          # data/cleaned_pages.json directly)
 ├── create.py              # One-off Pinecone index creation (768-dim, cosine)
 ├── db.py                  # SQLite logging for escalations & support requests
 ├── reranker.py            # Cross-encoder reranker
@@ -209,6 +213,75 @@ flowchart TD
 7. When the signal is `NOT_FOUND` or `ESCALATE`, the event is logged to SQLite (`db.py` → `data/carepal.db`) so the operations team can review it later.
 8. The answer + signal are returned to the Streamlit UI, which shows the support form for `NOT_FOUND` / `ESCALATE` cases.
 9. The admin dashboard (password-gated) displays all logged escalation events.
+
+---
+
+## Alternative Data Pipeline: `scraper.py` (How to Scrape the Data)
+
+The current RAG system reads from `data/cleaned_pages.json` (31 pre-scraped CarePal pages).  
+If you need to re-scrape fresh content from `thecarepal.com` yourself, use `scraper.py` — a standalone knowledge-base builder.
+
+### What `scraper.py` does (step by step)
+
+1. **Discovers URLs** — reads `sitemap.xml` and follows internal links from seed pages (homepage, contact, doctor, elderly care, dementia care, consultation, terms, privacy).
+2. **Scrapes pages** — uses Crawl4AI (headless Chromium) with a cloudscraper/BeautifulSoup fallback. Expands FAQ accordions via JavaScript.
+3. **Cleans content** — removes nav/footer/boilerplate, standardizes headings, fixes CarePal terminology.
+4. **Masks PII** — redacts emails, Aadhaar, PAN, credit card patterns.
+5. **Deduplicates** — removes exact and near-duplicate pages (threshold 0.92).
+6. **Structured extraction** — uses Groq (JSON mode via litellm) to extract FAQs, services, pricing, booking steps, contact info, and policy points per page. Falls back to the next model if one is unavailable.
+7. **Validates** — Pydantic models ensure the structured output has the right schema.
+8. **Saves outputs** — `thecarepal_output/cleaned_pages.json`, `structured_knowledge.json`, `langchain_documents.jsonl`, `scrape_audit.csv`, `pii_audit.json`, `run_summary.json`.
+
+### How to run the scraper
+
+```bash
+# 1. Install scraper dependencies
+pip install -U crawl4ai nest-asyncio requests cloudscraper beautifulsoup4
+
+# 2. Install the headless browser (run once)
+crawl4ai-setup
+
+# 3. Set your Groq API key (required for structured extraction)
+export GROQ_API_KEY=your_groq_api_key   # Linux/macOS
+# or set it in your .env file
+
+# 4. Run the scraper
+python scraper.py
+```
+
+### Output
+
+By default it scrapes up to 40 pages (`MAX_PAGES = 40` in `scraper.py`) and writes everything to `thecarepal_output/`:
+
+| File | What it contains |
+|------|-----------------|
+| `cleaned_pages.json` | Cleaned scraped pages (url, title, category, text, content_hash) |
+| `structured_knowledge.json` | Groq-extracted structured knowledge per page |
+| `langchain_documents.jsonl` | One LangChain Document per page (no chunking) |
+| `scrape_audit.csv` | URL, title, category, method, character count, hash |
+| `pii_audit.json` | PII masking findings per page |
+| `run_summary.json` | Run stats (pages scraped, accepted, duplicates, etc.) |
+
+### Feeding scraped data into the RAG pipeline
+
+The RAG chatbot expects `data/cleaned_pages.json` in this shape:
+
+```json
+[
+  { "url": "...", "title": "...", "category": "...", "text": "...", "content_hash": "..." }
+]
+```
+
+To use freshly scraped data:
+
+1. Copy `thecarepal_output/cleaned_pages.json` → `data/cleaned_pages.json` (or map the fields to match the shape above).
+2. Rebuild the knowledge base:
+   ```bash
+   python ingest.py --reset
+   ```
+3. This re-chunks, re-embeds, and re-uploads everything to Pinecone + BM25.
+
+> **Note:** `scraper.py` is an alternative data-collection pipeline. The current RAG chatbot does not call it at runtime — it uses the pre-existing `data/cleaned_pages.json` directly.
 
 ---
 
@@ -387,12 +460,73 @@ The database file (`data/carepal.db`) is gitignored via `*.db`.
 
 ## Evaluation
 
-A sanity benchmark of 33 gold questions (written from the same data) was used to compare chunking strategies. It is **not** a held-out test set; treat it as a design sanity check. For production, we recommend building a held-out evaluation set and measuring:
-- Hit@K / MRR for retrieval
-- Faithfulness and answer relevance for generation
-- Language-accuracy for Hindi/Hinglish responses
+The `evaluation/` folder contains a Ragas-based evaluation harness for the RAG pipeline.
 
-See `CHUNKING.md` limitations for details.
+### Files
+
+| File | Purpose |
+|------|---------|
+| `evaluation/test_questions.json` | 33 gold questions with reference answers and reference contexts |
+| `evaluation/evaluate.py` | Runs every question through the hybrid RAG pipeline and scores with Ragas |
+| `evaluation/ragas_results.json` | Saved evaluation results (generated after running) |
+
+### How to run
+
+**Prerequisites:**
+- `.env` configured with `PINECONE_API_KEY`, `PINECONE_INDEX`, `GROQ_API_KEY`
+- Knowledge base already ingested (`python ingest.py --reset`)
+- `ragas` installed (`pip install ragas`)
+
+```bash
+python evaluation/evaluate.py
+```
+
+### What it does
+
+1. Loads the 33 questions from `evaluation/test_questions.json`
+2. Runs each question through the hybrid RAG pipeline:
+   - BM25 + Pinecone retrieval (top-3)
+   - RRF fusion + cross-encoder reranking
+   - Groq answer generation (`openai/gpt-oss-120b`)
+3. Scores each (question, answer, contexts, reference) with four Ragas metrics:
+   - **Faithfulness** – is the answer supported by the retrieved context?
+   - **Answer Relevancy** – does the answer address the question?
+   - **Context Precision** – are the retrieved chunks relevant?
+   - **Context Recall** – does the context contain enough to answer?
+4. Prints a summary table and saves results to `evaluation/ragas_results.json`
+
+### Example output
+
+```
+================================================================================
+[1/33] QUESTION: What ways can I consult a doctor through CarePal?
+================================================================================
+
+ANSWER:
+You can consult a doctor through video, phone, or in-home visits...
+
+RETRIEVED CONTEXTS:
+--- Context 1 ---
+Multiple Modes of Consultation Choose between video, phone...
+
+...
+
+RAGAS EVALUATION RESULTS
+================================================================================
+                         score
+faithfulness        0.85
+answer_relevancy    0.78
+context_precision   0.81
+context_recall      0.74
+```
+
+### Notes
+
+- The evaluator LLM is `openai/gpt-oss-20b` on Groq (separate from the answer-generation model `openai/gpt-oss-120b`).
+- Embeddings for Answer Relevancy use the same `intfloat/multilingual-e5-base` model as ingestion.
+- This is a sanity benchmark built from the same data; treat it as a design check, not a held-out test.
+
+See `CHUNKING.md` for the chunking-strategy benchmark that preceded this.
 
 ---
 

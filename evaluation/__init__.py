@@ -1,0 +1,1 @@
+"""CarePal RAG evaluation package."""

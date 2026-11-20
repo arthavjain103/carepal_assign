@@ -1,0 +1,233 @@
+[
+  {
+    "question": "What ways can I consult a doctor through CarePal?",
+    "reference": "You can consult a doctor through video, phone, or in-home visits, depending on your comfort and urgency.",
+    "reference_contexts": [
+      "Multiple Modes of Consultation Choose between video, phone, or in-home visits— based on your comfort and urgency."
+    ]
+  },
+  {
+    "question": "Can I get a refund on my payment?",
+    "reference": "No. All payments for CarePal services are non-refundable; once a purchase is completed, no refunds, cancellations or reimbursements are issued, regardless of usage or service satisfaction.",
+    "reference_contexts": [
+      "Our Policy At CarePal, we strive to provide the best possible services to our clients. Please note that all payments made for our services are non-refundable.Once a purchase is completed, no refunds, cancellations, or reimbursements will be issued, regardless of usage or service satisfaction."
+    ]
+  },
+  {
+    "question": "Where is the CarePal office?",
+    "reference": "Oval Building, Hi-Tech City, Hyderabad, Telangana 500081.",
+    "reference_contexts": [
+      "Our Location Come visit our team in Hyderabad at Oval Building, Hi-Tech City, Hyderabad, Telangana 500081. Click the map for directions!"
+    ]
+  },
+  {
+    "question": "What share of Indians over 60 may have dementia?",
+    "reference": "A 2023 nationwide study (LASI-DAD) found that 7.4% of Indians over 60, about 8.8 million people, may already have dementia.",
+    "reference_contexts": [
+      "Rising Need for Specialized Care Estimates of people living with dementia in India rise from 3.7 million in 2010 to a forecast 11.4 million by 2050 -- about three times as many. A 2023 nationwide study (LASI-DAD) found 7.4% of Indians over 60, about 8.8 million people, may already have dementia."
+    ]
+  },
+  {
+    "question": "How many Indians will be aged 60 and above by 2050?",
+    "reference": "By 2050 India will have 347 million people aged 60 and over, about one in five Indians.",
+    "reference_contexts": [
+      "Rapid Growth in Elderly population India had 104 million people aged 60 and over at the 2011 Census and 149 million in 2022. By 2050 there will be 347 million: one Indian in five."
+    ]
+  },
+  {
+    "question": "Does live-in care include cooking meals for my parent?",
+    "reference": "Yes. Live-in care includes meal preparation: healthy and tasty meals prepared to suit the person's dietary needs and personal preferences.",
+    "reference_contexts": [
+      "Meal Preparation: Provides healthy and tasty meals specially prepared to suit your dietary needs and personal preferences."
+    ]
+  },
+  {
+    "question": "Which subscription plans can I choose when booking a carer?",
+    "reference": "You can choose between the CarePal Plus and CarePal Premium subscription plans.",
+    "reference_contexts": [
+      "Choose Your Plan Select a subscription that fits your needs — CarePal Plus or CarePal Premium — for continued, personalized support. 4"
+    ]
+  },
+  {
+    "question": "How old must I be to use the website?",
+    "reference": "You must be at least 18 years old to use the website.",
+    "reference_contexts": [
+      "3. Age Restriction You must be at least 18 (eighteen) years of age before you can use this website. By using this website, you warrant that you are at least 18 years of age and you may legally adhere to this Agreement. thecarepal assumes no responsibility for liabilities related to age misrepresentation."
+    ]
+  },
+  {
+    "question": "What early signs of autism are mentioned?",
+    "reference": "Early signs of autism mentioned are delayed speech, limited eye contact, and repetitive behaviors, which often appear in early childhood.",
+    "reference_contexts": [
+      "Early Signs Signs often appear in early childhood, such as delayed speech, limited eye contact, or repetitive behaviors."
+    ]
+  },
+  {
+    "question": "At what decibel level does CarePal warn me about headphone volume?",
+    "reference": "CarePal warns when headphone audio exceeds about 85 decibels; it instantly notifies the user and suggests lowering the volume or taking a break.",
+    "reference_contexts": [
+      "Hearing is more than just sound—it's how we connect, communicate, and experience the world. But with age and technology combined, many seniors are unknowingly risking their hearing health every day. From blasting TV volumes to prolonged headphone use, these habits may seem harmless but can silently damage your ears over time. That's where CarePal steps in as your hearing health guardian. CarePal's Hearing Section is designed to monitor your headphone audio levels in real time. If the volume exceeds safe limits—typically above 85 decibels—CarePal instantly notifies you and suggests simple, actionable steps like lowering volume or taking a break. But it's not just about alerts—it's about awareness. CarePal helps you track daily listening exposure, understand your risk zones, and adjust your audio habits over time. It also shares tips like using noise-canceling headphones (so you don't need to crank the volume) and setting smart volume limits. Whether you're listening to music, attending virtual calls, or watching a movie, CarePal ensures your ears stay safe—without missing a beat. Because healthy hearing means staying connected to the voices, stories, and moments that matter most. Can you hear that? It's your future thanking you. ← Back to all articles"
+    ]
+  },
+  {
+    "question": "Can a software developer apply for a job at CarePal?",
+    "reference": "Yes. The careers page has an 'Apply as developer' option (alongside nurse, doctor and caretaker); you submit your details and resume to apply.",
+    "reference_contexts": [
+      "Submit your details and resume to apply. 👩‍⚕️ Apply as nurse 💻 Apply as developer 👨‍⚕️ Apply as doctor 🧑‍🦽 Apply as caretaker Drag & drop your resume here or click to upload Submit Application"
+    ]
+  },
+  {
+    "question": "Does CarePal provide health insurance for its team?",
+    "reference": "Yes. The careers page lists comprehensive health insurance, mental health support, and wellness programs under Health & Wellness.",
+    "reference_contexts": [
+      "Health & Wellness Comprehensive health insurance, mental health support, and wellness programs"
+    ]
+  },
+  {
+    "question": "Is autism considered an illness?",
+    "reference": "No. Autism is not an illness; it is a different way of thinking, processing, and engaging with the world.",
+    "reference_contexts": [
+      "Neurodiversity Autism is not an illness — it's a different way of thinking, processing, and engaging with the world."
+    ]
+  },
+  {
+    "question": "Are therapists at CarePal licensed?",
+    "reference": "Yes. CarePal offers one-on-one therapy sessions with licensed professionals, designed to be private, flexible and accessible from home.",
+    "reference_contexts": [
+      "Accessible Mental Health Support Book one-on-one therapy sessions with licensed professionals—designed to be private, flexible, and easy to access from home."
+    ]
+  },
+  {
+    "question": "What did families say about how fast the emergency team arrived?",
+    "reference": "Families said the emergency care team reached them within minutes and responded quickly and in an organized way, with the support team keeping them updated.",
+    "reference_contexts": [
+      "Hear From Families Who Chose Emergency Care ★★★★☆ I didn't expect such a quick and organized response. The app made it so easy to request help, and the support team kept me updated every step of the way. Highly recommend for urgent situations. Anmol Gupta ★★★★★ The emergency care team reached us within minutes. It was a huge relief to see someone take charge confidently and ensure my mother was stable until we got to the hospital. Thank you, CarePal! Akash Singh ★★★★☆ When my father had a sudden health episode late at night, we booked emergency care through CarePal. The response was swift, and the caregiver arrived fully prepared. Ananya Kumar ★★★☆☆ Our emergency caregiver was not only skilled but gentle with my grandmother. So grateful for the support. Meera Verma"
+    ]
+  },
+  {
+    "question": "What does elderly care offer for medication?",
+    "reference": "Elderly care includes timely medication reminders and coordination with nurses or doctors when needed.",
+    "reference_contexts": [
+      "Medical & Medication Support Timely medication reminders and coordination with nurses or doctors when needed."
+    ]
+  },
+  {
+    "question": "Will the doctor always prescribe medicines?",
+    "reference": "No. Medications or therapy suggestions are provided only when truly necessary, based on the person's condition.",
+    "reference_contexts": [
+      "Prescriptions, If Needed Medications or therapy suggestions are provided only when truly necessary, based on your condition."
+    ]
+  },
+  {
+    "question": "What tasks do baby care caregivers handle?",
+    "reference": "Baby care caregivers provide loving, attentive support such as feeding, bathing and soothing the baby, and being an extra pair of hands for parents.",
+    "reference_contexts": [
+      "Baby Care with TheCarePal At TheCarePal, we understand how delicate and important your baby's early days are. Our trained caregivers provide loving, attentive support—whether it's feeding, bathing, soothing, or simply being there when you need an extra hand. ✓"
+    ]
+  },
+  {
+    "question": "Is the first baby care consultation free?",
+    "reference": "Yes. CarePal offers a free consultation for baby care, with no commitment required.",
+    "reference_contexts": [
+      "Ready to Give Your Baby the Best Care? Join thousands of parents who trust TheCarePal for their baby's wellbeing. Get started with a free consultation today. Book Baby Care NowSchedule Free Consultation No commitment required • Free consultation • Available 24/7"
+    ]
+  },
+  {
+    "question": "How long does CarePal keep my personal data?",
+    "reference": "CarePal retains personal data only as long as necessary for the purposes in the Privacy Policy, and as needed to comply with legal obligations, resolve disputes, and enforce its agreements and policies.",
+    "reference_contexts": [
+      "Retention of Your Personal Data The Company will retain Your Personal Data only for as long as is necessary for the purposes set out in this Privacy Policy. We will retain and use Your Personal Data to the extent necessary to comply with our legal obligations (for example, if we are required to retain your data to comply with applicable laws), resolve disputes, and enforce our legal agreements and policies. The Company will also retain Usage Data for internal analysis purposes. Usage Data is generally retained for a shorter period of time, except when this data is used to strengthen the security or to improve the functionality of Our Service, or We are legally obligated to retain this data for longer time periods."
+    ]
+  },
+  {
+    "question": "Is the app meant for kids under 13?",
+    "reference": "No. The app is not intended for users under 13, and CarePal does not knowingly collect personal information from children.",
+    "reference_contexts": [
+      "Children's Privacy Our app is not intended for users under the age of 13. We do not knowingly collect personal information from children. If you believe we have unknowingly collected such data, please contact us immediately."
+    ]
+  },
+  {
+    "question": "Is CarePal liable for damages from website misuse?",
+    "reference": "No. The terms state that CarePal (thecarepal) is not liable for damages that result from your misuse of the website.",
+    "reference_contexts": [
+      "9. Limitation on Liability thecarepal is not liable for any damages that may occur to you as a result of your misuse of our website."
+    ]
+  },
+  {
+    "question": "How will users be told about changes to the terms?",
+    "reference": "CarePal informs users of changes to the Terms and Conditions through electronic mail (email).",
+    "reference_contexts": [
+      "10. Changes to Terms and Conditions thecarepal reserves the right to edit, modify, and change this Agreement at any time. We shall let our users know of these changes through electronic mail. This Agreement is an understanding between thecarepal and the user, and this supersedes and replaces all prior agreements regarding the use of this website."
+    ]
+  },
+  {
+    "question": "How does CarePal help me remember pills and refills?",
+    "reference": "CarePal's medication tracking lets you set personalized reminders for each dose, including names, timings and instructions, and even refill alerts.",
+    "reference_contexts": [
+      "Taking your medication shouldn't feel like a guessing game. Whether it's one pill a day or managing a complex schedule, CarePal makes it easy to stay consistent, safe, and in control of your health. With CarePal's smart medication tracking, you can set personalized reminders for each dose, complete with names, timings, instructions, and even refill alerts. No more sticky notes, missed alarms, or confusion about what to take and when. For those taking multiple medications—especially seniors or individuals managing chronic conditions—CarePal helps reduce the risk of missed doses, double-dosing, or harmful interactions. Everything is stored in one place, easy to access, and fully customizable to fit your routine. CarePal also supports caregivers and family members, allowing them to monitor adherence and receive notifications if a dose is skipped—offering peace of mind even from miles away. Whether you're recovering from surgery, managing diabetes, or just aiming to live healthier, CarePal turns medication management into a stress-free experience. It's not just about reminders—it's about building a habit that supports long-term well-being. With CarePal, you're not just tracking pills—you're taking control of your health, one dose at a time. ← Back to all articles"
+    ]
+  },
+  {
+    "question": "What response time does CarePal promise on contact?",
+    "reference": "The contact page promises a response in under 60 minutes, with 24/7 support.",
+    "reference_contexts": [
+      "Get in Touch Ready to transform your healthcare experience? We're here to help you every step of the way. 24/7 Support <60min Response 100% Satisfaction 🗓️Book Now"
+    ]
+  },
+  {
+    "question": "Which senior doctor shared feedback on working with CarePal?",
+    "reference": "Dr. Sharma, a Senior Doctor, shared feedback on working with CarePal.",
+    "reference_contexts": [
+      "Dr. Sharma Senior Doctor \"The CarePal has transformed how I practice medicine. The flexibility to work with families directly while having platform support is incredible.\""
+    ]
+  },
+  {
+    "question": "How many 60+ people did India have in 2022?",
+    "reference": "India had 149 million people aged 60 and over in 2022.",
+    "reference_contexts": [
+      "Rapid Growth in Elderly population India had 104 million people aged 60 and over at the 2011 Census and 149 million in 2022. By 2050 there will be 347 million: one Indian in five."
+    ]
+  },
+  {
+    "question": "How many people lived with dementia in India in 2010 vs the 2050 forecast?",
+    "reference": "Estimates of people living with dementia in India rise from 3.7 million in 2010 to a forecast 11.4 million by 2050, about three times as many.",
+    "reference_contexts": [
+      "Rising Need for Specialized Care Estimates of people living with dementia in India rise from 3.7 million in 2010 to a forecast 11.4 million by 2050 -- about three times as many. A 2023 nationwide study (LASI-DAD) found 7.4% of Indians over 60, about 8.8 million people, may already have dementia."
+    ]
+  },
+  {
+    "question": "What does a nurse consultation cover?",
+    "reference": "A nurse consultation covers wound care, injections, monitoring vitals, and post-surgery support.",
+    "reference_contexts": [
+      "Why nurse consultation Whether it's wound care, injections, monitoring vitals, or post-surgery support, nurses bring comfort, skill, and consistency right to your doorstep."
+    ]
+  },
+  {
+    "question": "Why does CarePal say therapy is not only for crisis?",
+    "reference": "CarePal says therapy is not just for crisis; it is a tool for everyday clarity, resilience and emotional balance, and having a trained person to listen and guide you makes a big difference.",
+    "reference_contexts": [
+      "Why mental therapy Matters Therapy isn't just for crisis — it's a tool for everyday clarity, resilience, and emotional balance. Life brings stress, change, and uncertainty, and having someone trained to listen and guide you can make a powerful difference."
+    ]
+  },
+  {
+    "question": "What are CarePal's company values?",
+    "reference": "CarePal's values are Compassion First, Trust & Safety, Excellence, and Teamwork.",
+    "reference_contexts": [
+      "Our Values Compassion First Every decision we make is guided by empathy and genuine care for patients and families. Trust & Safety We maintain the highest standards of safety and build lasting trust with our community. Excellence We strive for excellence in everything we do, continuously improving our services. Teamwork We believe in the power of teamwork and collaboration to achieve our mission."
+    ]
+  },
+  {
+    "question": "Which free telemedicine service figures does CarePal cite?",
+    "reference": "CarePal cites figures for eSanjeevani, the Indian government's free telemedicine service.",
+    "reference_contexts": [
+      "How doctor consultations Have Evolved to Meet Your Changing Needs Seeing a doctor online has become normal across India. These are the government's own figures for eSanjeevani, its free telemedicine service. Total doctor consultations on eSanjeevani, in millions (Hover over the points to see the data) Sources:Ministry of Health & Family Welfare on eSanjeevani, September 2021; Ministry of Health & Family Welfare on eSanjeevani, February 2023; Union Health Minister, written reply in the Rajya Sabha (as on 23 Nov 2025)."
+    ]
+  },
+  {
+    "question": "What does the live-in caregiver help with regarding mobility?",
+    "reference": "The live-in caregiver gives kind support with walking, getting around, and using walking aids safely.",
+    "reference_contexts": [
+      "Mobility Assistance: Kind support with walking, getting around, and using walking aids safely."
+    ]
+  }
+]
