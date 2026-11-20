@@ -1,0 +1,30 @@
+# ── LLM & RAG ──────────────────────────────────────
+langchain-groq
+langchain-core
+langchain-community
+langchain-pinecone
+langchain-huggingface
+langchain-text-splitters
+groq
+pinecone-client
+
+# ── Embeddings & Retrieval ─────────────────────────
+sentence-transformers
+rank-bm25
+numpy
+nltk
+
+# ── Web & API ──────────────────────────────────────
+fastapi
+uvicorn[standard]
+pydantic
+requests
+
+# ── Scraping & Ingestion ──────────────────────────
+beautifulsoup4
+pypdf
+cloudscraper
+nest-asyncio
+
+# ── Config ─────────────────────────────────────────
+python-dotenv

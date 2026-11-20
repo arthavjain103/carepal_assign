@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.python-version
+
+# Package managers
+pip-wheel-metadata/
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# IDEs / editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Data files
+*.pkl
+*.db
+*.sqlite
+
+# Audio / temp
+*.wav
+*.mp3
+*.tmp
+*.temp
+
+# FastAPI / Uvicorn
+*.reload
+
+# Transcripts and local runtime artifacts
+transcript_*.json
+
+# Generated caches
+*.cache
+
+# Ignore transfer/session paths
+*.env
+
+# Specific project files
+data/bm25.pkl
+faq_kb_sources.pkl
