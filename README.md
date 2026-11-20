@@ -54,6 +54,30 @@ Two interfaces are provided:
 
 ---
 
+## AI Tools & Costs
+
+### AI tools used during development
+
+| Tool | Used for |
+|------|----------|
+| LLM coding assistant | Writing and reviewing code, drafting the README, generating the Mermaid flowchart, and explaining design decisions. All code was reviewed, tested, and understood before submission. |
+
+### Cost to run each library / model
+
+| Library / Model | Purpose | Pricing model | Approx. cost |
+|-----------------|---------|---------------|--------------|
+| **Groq** — `openai/gpt-oss-120b` | Answer generation | Pay-per-token (Groq has a free tier; paid beyond free limits) | Free tier available; paid usage is per million tokens |
+| **Pinecone** | Vector storage & semantic search | Free Starter tier (limited index size & pods); paid plans beyond that | Free Starter tier; paid scales with index size |
+| **`intfloat/multilingual-e5-base`** | Embeddings | Open model, self-hosted on CPU via `sentence-transformers` | Free (no API cost; runs on your hardware) |
+| **`cross-encoder/ms-marco-MiniLM-L-6-v2`** | Reranking | Open model, self-hosted on CPU | Free (no API cost; runs on your hardware) |
+| **`rank-bm25`** | Keyword search | Open-source library | Free |
+| **FastAPI / Uvicorn / Streamlit** | Web server + frontend | Open-source | Free |
+| **LangChain packages** (`langchain-groq`, `langchain-core`, `langchain-pinecone`, `langchain-huggingface`) | LLM / vector-store integrations | Open-source | Free |
+
+**Bottom line:** The project can run entirely on free tiers (Groq free tier + Pinecone Starter + self-hosted embeddings/reranker on CPU). You only pay if you exceed Groq's free token allowance or Pinecone's Starter index limits.
+
+---
+
 ## Project Structure
 
 ```
