@@ -59,3 +59,4 @@ transcript_*.json
 # Specific project files
 data/bm25.pkl
 faq_kb_sources.pkl
+.env

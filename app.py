@@ -9,7 +9,8 @@ from pydantic import BaseModel
 
 from pro.semantic import SemanticSearch
 from pro.hybrid import CombinedSearch
-from llm.chat import generate_answer  # generate_answer(question, context) -> str
+from llm.chat import generate_answer_ex  # generate_answer_ex(question, context) -> (answer, signal)
+import db
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
@@ -39,6 +40,10 @@ def extract_sources(results, max_sources: int = 3) -> list[str]:
 async def lifespan(app: FastAPI):
     """Load heavy models once at startup; release on shutdown."""
     global hybrid_search
+
+    logger.info("Initializing SQLite escalation DB …")
+    db.init_db()
+    logger.info("Escalation DB ready.")
 
     logger.info("Loading BM25 model from data/bm25.pkl …")
     with open("data/bm25.pkl", "rb") as f:
@@ -91,6 +96,7 @@ class SearchResponse(BaseModel):
     answer: str
     chunks: list[dict] = []     # [{"text": "...", "score": 0.85}, ...]
     sources: list[str] = []
+    signal: str | None = None   # 'NOT_FOUND' | 'ESCALATE' | None
 
 
 class HealthResponse(BaseModel):
@@ -140,17 +146,22 @@ async def search(request: SearchRequest):
 
         if not context.strip():
             logger.warning("No context retrieved for query: %s", query)
-            return SearchResponse(answer="I couldn't find this information.")
+            db.log_event(question=query, answer="I couldn't find this information.", signal="NOT_FOUND")
+            return SearchResponse(answer="I couldn't find this information.", signal="NOT_FOUND")
 
         # Step 5: Generate final answer via Groq
-        answer = generate_answer(question=query, context=context)
+        answer, signal = generate_answer_ex(question=query, context=context)
+
+        # Log escalation / not-found events for admin review
+        if signal in ("NOT_FOUND", "ESCALATE"):
+            db.log_event(question=query, answer=answer, signal=signal)
 
         # Cite only when the model actually answered from the content
-        not_found = "couldn't find this information" in answer.lower()
+        not_found = signal == "NOT_FOUND"
         sources = [] if not_found else extract_sources(results)
 
-        logger.info("Answer generated successfully. Sources: %s", sources)
-        return SearchResponse(answer=answer, chunks=chunks, sources=sources)
+        logger.info("Answer generated successfully. Signal: %s, Sources: %s", signal, sources)
+        return SearchResponse(answer=answer, chunks=chunks, sources=sources, signal=signal)
 
     except Exception as exc:
         logger.error("Error processing query '%s': %s", request.query, exc, exc_info=True)

@@ -3,6 +3,8 @@ import os
 import requests
 import streamlit as st
 
+from db import log_event, get_events, get_unanswered_count, init_db
+
 st.set_page_config(
     page_title="TheCarePal Support Assistant",
     page_icon="💙",
@@ -15,6 +17,9 @@ st.set_page_config(
 
 DEFAULT_API_URL = os.getenv("CAREPAL_API_URL", "http://localhost:8000")
 REQUEST_TIMEOUT = 60  # seconds
+
+# Ensure the SQLite escalation DB exists
+init_db()
 
 # Phrases returned by app.py / chat.py when nothing useful was found.
 # Used to decide whether to offer the human-handoff form.
@@ -55,8 +60,10 @@ def get_rag_response(question: str, api_url: str) -> dict:
     answer = (data.get("answer") or "").strip()
     sources = data.get("sources") or []
     chunks = data.get("chunks") or []
+    signal = data.get("signal")  # 'NOT_FOUND' | 'ESCALATE' | None
 
-    found = bool(answer) and not any(
+    # An answer is "found" only when we have real content and no escalation signal
+    found = bool(answer) and signal not in ("NOT_FOUND", "ESCALATE") and not any(
         marker in answer.lower() for marker in NOT_FOUND_MARKERS
     )
 
@@ -65,6 +72,7 @@ def get_rag_response(question: str, api_url: str) -> dict:
         "sources": sources,
         "chunks": chunks,
         "found": found,
+        "signal": signal,
         "raw_keys": list(data.keys()),
     }
 
@@ -78,14 +86,8 @@ def check_backend(api_url: str) -> bool:
 
 
 def save_support_request(name: str, phone: str, question: str) -> None:
-    """
-    TODO: Save this request in PostgreSQL using your backend API
-    or a database function, e.g.:
-
-    requests.post(f"{api_url}/support-request",
-                  json={"name": name, "phone": phone, "question": question})
-    """
-    pass
+    """Persist a human-handoff request to SQLite for admin review."""
+    log_event(question=question, answer="", signal="ESCALATE", name=name, phone=phone)
 
 
 # -------------------------------------------------
@@ -134,6 +136,34 @@ if st.sidebar.button("Clear Chat", use_container_width=True):
     st.session_state.last_question = ""
     st.rerun()
 
+# -------------------------------------------------
+# SIDEBAR: ADMIN VIEW (simple password gate)
+# -------------------------------------------------
+st.sidebar.markdown("---")
+st.sidebar.subheader("🔐 Admin")
+
+if "admin_auth" not in st.session_state:
+    st.session_state.admin_auth = False
+
+if not st.session_state.admin_auth:
+    admin_pw = st.sidebar.text_input("Admin password", type="password", key="admin_pw_input")
+    if st.sidebar.button("Unlock admin", key="admin_unlock"):
+        if admin_pw == "carepal2026":  # change in production
+            st.session_state.admin_auth = True
+            st.rerun()
+        else:
+            st.sidebar.error("Incorrect password")
+else:
+    st.sidebar.success("Admin unlocked")
+    if st.sidebar.button("Lock admin", key="admin_lock"):
+        st.session_state.admin_auth = False
+        st.rerun()
+
+    unanswered = get_unanswered_count()
+    st.sidebar.metric("Unanswered / Escalated", unanswered)
+
+    if st.sidebar.button("Refresh admin data", key="admin_refresh"):
+        st.rerun()
 
 # -------------------------------------------------
 # MAIN UI
@@ -185,13 +215,43 @@ if question:
                 sources = result["sources"]
                 chunks = result["chunks"]
                 found = result["found"]
+                signal = result.get("signal")
 
                 st.session_state.retrieved_chunks = chunks
                 st.session_state.raw_keys = result["raw_keys"]
                 st.session_state.last_question = question
 
-                if found:
+                # --- ESCALATE signal: show answer + support form ---
+                if signal == "ESCALATE":
+                    st.markdown(answer)
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": answer,
+                        "sources": sources
+                    })
+                    st.info("Would you like me to connect you with our support team?")
+                    st.session_state.support_form = True
 
+                # --- NOT_FOUND signal: show fallback + support form ---
+                elif signal == "NOT_FOUND" or not found:
+                    fallback = answer or (
+                        "I couldn't find reliable information about "
+                        "this question in our available resources."
+                    )
+                    handoff = (
+                        "Would you like me to connect you "
+                        "with our support team?"
+                    )
+                    st.warning(fallback)
+                    st.write(handoff)
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": f"{fallback}\n\n{handoff}"
+                    })
+                    st.session_state.support_form = True
+
+                # --- Normal answer ---
+                else:
                     st.markdown(answer)
 
                     if sources:
@@ -204,28 +264,6 @@ if question:
                         "content": answer,
                         "sources": sources
                     })
-
-                else:
-                    # Show the backend's own message if it gave one,
-                    # otherwise a generic fallback.
-                    fallback = answer or (
-                        "I couldn't find reliable information about "
-                        "this question in our available resources."
-                    )
-                    handoff = (
-                        "Would you like me to connect you "
-                        "with our support team?"
-                    )
-
-                    st.warning(fallback)
-                    st.write(handoff)
-
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": f"{fallback}\n\n{handoff}"
-                    })
-
-                    st.session_state.support_form = True
 
             except requests.exceptions.ConnectionError:
                 st.error(
@@ -314,3 +352,47 @@ with chunks_box.container():
     # Debug: shows which fields the backend actually returned
     if st.session_state.get("raw_keys") is not None:
         st.caption(f"Backend returned fields: {st.session_state.raw_keys}")
+
+
+# -------------------------------------------------
+# ADMIN DASHBOARD (main area, shown only when unlocked)
+# -------------------------------------------------
+if st.session_state.get("admin_auth"):
+    st.markdown("---")
+    st.subheader("📋 Admin — Escalation & Support Requests")
+
+    events = get_events(limit=200)
+
+    if not events:
+        st.info("No escalation or support requests logged yet.")
+    else:
+        # Summary metrics
+        col1, col2, col3 = st.columns(3)
+        not_found_count = sum(1 for e in events if e["signal"] == "NOT_FOUND")
+        escalate_count = sum(1 for e in events if e["signal"] == "ESCALATE")
+        with_contact = sum(1 for e in events if e["name"] or e["phone"])
+
+        col1.metric("Total events", len(events))
+        col2.metric("Not found (NOT_FOUND)", not_found_count)
+        col3.metric("Human escalation (ESCALATE)", escalate_count)
+        st.caption(f"With contact details provided: {with_contact}")
+
+        st.markdown("### Recent events")
+        for ev in events:
+            signal_label = {
+                "NOT_FOUND": "🔍 Not found",
+                "ESCALATE": "📞 Human escalation",
+            }.get(ev["signal"], ev["signal"] or "—")
+
+            with st.expander(
+                f"{signal_label} — {ev['created_at'][:16]} — "
+                f"{ev['question'][:60]}..."
+            ):
+                st.markdown(f"**Question:** {ev['question']}")
+                st.markdown(f"**Answer:** {ev['answer'] or '_(none)_'}")
+                st.markdown(f"**Signal:** `{ev['signal']}`")
+                if ev["name"]:
+                    st.markdown(f"**Name:** {ev['name']}")
+                if ev["phone"]:
+                    st.markdown(f"**Phone:** {ev['phone']}")
+                st.markdown(f"**Created at:** {ev['created_at']}")

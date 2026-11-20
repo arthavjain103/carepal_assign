@@ -86,6 +86,7 @@ care_assign/
 ├── main.py                # CLI chatbot
 ├── ingest.py              # Build KB: chunks → Pinecone vectors + BM25 index
 ├── create.py              # One-off Pinecone index creation (768-dim, cosine)
+├── db.py                  # SQLite logging for escalations & support requests
 ├── reranker.py            # Cross-encoder reranker
 ├── config.py              # Config & env loader (chunk sizes, top-k)
 ├── CHUNKING.md            # Chunking strategy + benchmark rationale
@@ -182,13 +183,20 @@ flowchart TD
     K -->|"ESCALATE"| M[Reply: connect to human agent]
     K -->|None| N[Answer from context only]
     
-    L --> O[Return Answer + Sources<br/>FastAPI /search → Streamlit UI]
-    M --> O
+    L --> P[Log to SQLite<br/>db.py → data/carepal.db]
+    M --> P
+    P --> Q[Show support form<br/>Name + Phone + Consent]
+    Q --> O[Return Answer + Signal<br/>FastAPI /search → Streamlit UI]
+    
     N --> O
+    
+    O --> R[Admin Dashboard<br/>Streamlit sidebar → view escalations]
     
     style A fill:#e1f5fe,stroke:#01579b
     style J fill:#fff3e0,stroke:#e65100
     style O fill:#e8f5e9,stroke:#1b5e20
+    style P fill:#ffe0b2,stroke:#ef6c00
+    style R fill:#e8f5e9,stroke:#1b5e20
 ```
 
 **Flow summary:**
@@ -197,7 +205,10 @@ flowchart TD
 3. BM25 and Pinecone retrieve candidates in parallel.
 4. Results are fused with RRF and reranked by a cross-encoder to the top 5 chunks.
 5. The top chunks form the context for the Groq LLM, which answers strictly from that context in the user's language.
-6. The answer is returned with source URLs; `[[NOT_FOUND]]` / `[[ESCALATE]]` tags trigger graceful fallbacks.
+6. The LLM ends with `[[NOT_FOUND]]` or `[[ESCALATE]]` when applicable; these tags are parsed as a `signal`.
+7. When the signal is `NOT_FOUND` or `ESCALATE`, the event is logged to SQLite (`db.py` → `data/carepal.db`) so the operations team can review it later.
+8. The answer + signal are returned to the Streamlit UI, which shows the support form for `NOT_FOUND` / `ESCALATE` cases.
+9. The admin dashboard (password-gated) displays all logged escalation events.
 
 ---
 
@@ -333,6 +344,44 @@ Full rationale and benchmark numbers are in **`CHUNKING.md`**. Summary:
 6. **Skip** pages < 200 chars after cleaning (e.g. the Sign-in page).
 
 Result: 187 chunks, 160–1,358 chars, 0 noise chunks, 0 duplicates, 0 fragments < 150 chars.
+
+---
+
+## Human Escalation & Admin View
+
+When the assistant cannot answer from the knowledge base, or when a user asks to speak to a human, the event is logged to SQLite (`data/carepal.db`) so the operations team can review it later.
+
+### How it works
+
+1. **`llm/chat.py`** — The Groq prompt instructs the model to end its reply with `[[NOT_FOUND]]` (when the answer isn't in the context) or `[[ESCALATE]]` (when the user asks for a human/agent/callback). These tags are parsed and returned as a `signal`.
+2. **`app.py`** — The FastAPI `/search` endpoint calls `generate_answer_ex()` (not the old `generate_answer()`), so it receives both the answer and the signal. If the signal is `NOT_FOUND` or `ESCALATE`, the event is written to SQLite via `db.log_event()`.
+3. **`streamlit_app.py`** — The support form (name + phone + consent) now calls `save_support_request()`, which persists the escalation to SQLite.
+4. **`db.py`** — SQLite layer with `init_db()`, `log_event()`, `get_events()`, `get_unanswered_count()`, and `get_unanswered_count()`.
+
+### Admin view
+
+The Streamlit frontend has a password-gated admin dashboard:
+
+- **Unlock:** Enter the admin password in the sidebar (default: `carepal2026` — change this in production).
+- **Sidebar:** Shows a count of unanswered / escalated events.
+- **Main area:** Lists all logged events with question, answer, signal, contact details (if provided), and timestamp.
+- **Use case:** The operations team can review questions the assistant couldn't answer and decide what content to add to the knowledge base.
+
+### Database schema
+
+```sql
+CREATE TABLE escalations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    question TEXT NOT NULL,
+    answer TEXT,
+    signal TEXT,             -- 'NOT_FOUND' | 'ESCALATE' | NULL
+    name TEXT,
+    phone TEXT,
+    created_at TEXT NOT NULL
+);
+```
+
+The database file (`data/carepal.db`) is gitignored via `*.db`.
 
 ---
 
